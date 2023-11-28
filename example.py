@@ -1,4 +1,4 @@
-import logging
+import sys
 import datetime
 import telebot
 from loguru import logger
@@ -8,6 +8,8 @@ from telebot.types import ReplyKeyboardRemove, CallbackQuery
 
 def error_filter(record):
     return record["level"].name == "ERROR"
+
+logger.configure(handlers=[{"sink": sys.stderr, "format": "{time} {level} {message} {function} {line}"}])
 
 API_TOKEN = "6605597490:AAHI49AcT_bSQ0ariJIfrucybV5YR1HwFTE"
 logger.add("errors.log", filter=error_filter)
@@ -41,7 +43,7 @@ def check_other_messages(message):
         )
         logger.debug(f"Sent calendar to user: {message.from_user.id}")
     except Exception as e:
-        logger.exception(f"Error in /start handler: {e}")
+        logger.error(f"Error in /start handler: {e}")
 
 
 @bot.callback_query_handler(
@@ -78,7 +80,7 @@ def callback_inline(call: CallbackQuery):
             logger.info(f"User {call.from_user.id} cancelled the action.")
             print(f"{calendar_1_callback}: Cancellation")
     except Exception as e:
-        logger.exception(f"Error in callback query handler: {e}")
+        logger.error(f"Error in callback query handler: {e}")
 
 
 bot.polling(none_stop=True)
